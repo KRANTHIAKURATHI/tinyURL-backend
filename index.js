@@ -9,7 +9,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:5173'],
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://tiny-url-ui-tilk.vercel.app'
+  ],
   credentials: true
 }));
 app.use(bodyParser.json({ limit: '10mb' }));
