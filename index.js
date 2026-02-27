@@ -7,15 +7,26 @@ const { redirectUrl } = require('./controllers/urlController');
 
 const app = express();
 
-// Middleware
+// ✅ Updated CORS Configuration
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'https://tiny-url-ui-tilk.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    // Allow localhost (development)
+    if (origin.includes('localhost')) {
+      return callback(null, true);
+    }
+
+    // Allow all Vercel deployments (preview + production)
+    if (origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
+
 app.use(bodyParser.json({ limit: '10mb' }));
 
 // Routes
@@ -35,8 +46,8 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Test database connection on startup
 const DBconnect = require('./database/DBconnect');
+
 DBconnect()
   .then(() => {
     app.listen(PORT, () => {
